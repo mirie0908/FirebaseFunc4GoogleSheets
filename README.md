@@ -9,17 +9,18 @@
                   　トリガ      --------------------------
                               [Google firebase Functions]
 ```
-##　REST API
+
+## REST API
 - METHOD              ：　GET
 - URL(APIエンドポイント）： https://us-central1-automatic-rock-204313.cloudfunctions.net/googlesheets
 - パラメタ　　　　　　　　:  name （Sheetに追記する氏名の文字列）
 
-hogehogeさんをSheetに登録するときの REST APIのコール：
+- hogehogeさんをSheetに登録するときの REST APIのコール：
 ```
 GET https://us-central1-automatic-rock-204313.cloudfunctions.net/googlesheets?name=hogehoge とコールする
 ```
 
-curlコマンドをクライアント側として、以下のcurlコマンドで実行する：
+- curlコマンドをクライアント側として、以下のcurlコマンドで実行する：
 ```
 curl -s -G -d name=hogehoge "https://us-central1-automatic-rock-204313.cloudfunctions.net/googlesheets"
 ```
