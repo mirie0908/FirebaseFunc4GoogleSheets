@@ -103,7 +103,7 @@ exports.googlesheets = functions.https.onRequest((request,response) => {
         };
         console.log('１行追加実行');
         //sheets.spreadsheets.values.append(requestparam, function(err, resp) {
-        sheets.spreadsheets.values.append(requestparam, (err, resp) => {
+        return sheets.spreadsheets.values.append(requestparam, (err, resp) => {
           if (err) {
             console.log('err: ' + err);
             //return;
@@ -111,7 +111,7 @@ exports.googlesheets = functions.https.onRequest((request,response) => {
           }
           // TODO: Change code below to process the `response` object:
           // console.log(JSON.stringify(response, null, 2)); これ、stringifyすると、circular structure構造が循環してるよエラー出る。のでやめ。
-          return;
+          return response.send("Google sheet append complete.");
         });    
       } else {
         //console.log('既エントリの名簿データがありません。'); //console.log('No data found.');
