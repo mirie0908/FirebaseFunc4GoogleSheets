@@ -17,7 +17,8 @@ exports.hello = functions.https.onRequest((request, response) => {
  
  
 exports.googlesheets = functions.https.onRequest((request,response) => {
-  
+
+  // パラメータ１．氏名
   var reqname = "";
   if (request.query.name !== undefined) {
     reqname = request.query.name
@@ -27,7 +28,43 @@ exports.googlesheets = functions.https.onRequest((request,response) => {
     //response.status(200).send("Hello World")
     response.send("No name param specified");
   }
-  
+
+  // パラメータ２．
+  var reqnear = "";
+  if (request.query.near !== undefined) {
+    reqnear = request.query.near
+    //response.status(200).send("Hello " + param)
+    console.log('requested near: ' + reqnear);
+  } else {
+    //response.status(200).send("Hello World")
+    response.send("No near param specified");
+  }
+
+  // パラメータ３．
+  var reqfree = "";
+  if (request.query.free !== undefined) {
+    reqfree = request.query.free
+    //response.status(200).send("Hello " + param)
+    console.log('requested free: ' + reqfree);
+  } else {
+    //response.status(200).send("Hello World")
+    response.send("No free param specified");
+  }
+
+  // パラメータ４．
+  var reqearly = "";
+  if (request.query.early !== undefined) {
+    reqearly = request.query.early
+    //response.status(200).send("Hello " + param)
+    console.log('requested early: ' + reqearly);
+  } else {
+    //response.status(200).send("Hello World")
+    response.send("No early param specified");
+  }
+
+    
+
+    
   
   // Load client secrets from a local file.
   fs.readFile('client_secret.json', (err, content) => {
@@ -37,10 +74,10 @@ exports.googlesheets = functions.https.onRequest((request,response) => {
     }
     // Authorize a client with credentials, then call the Google Sheets API.
     //response.send("now authorize func will be executed..");
-    authorize(JSON.parse(content), listMajors, reqname);
+    authorize(JSON.parse(content), listMajors, reqname, reqnear, reqfree, reqearly);
   });
     
-  function authorize(credentials, callback, reqname) {
+  function authorize(credentials, callback, reqname, reqnear, reqfree, reqearly) {
     const {client_secret, client_id, redirect_uris} = credentials.installed;
     const oAuth2Client = new google.auth.OAuth2(
       client_id, client_secret, redirect_uris[0]);
@@ -51,18 +88,18 @@ exports.googlesheets = functions.https.onRequest((request,response) => {
       if (err) {
           response.send('getNewToken necessary in advance.');
       }
-      oAuth2Client.setCredentials(JSON.parse(token));
-      callback(oAuth2Client,reqname);
+	oAuth2Client.setCredentials(JSON.parse(token));
+	callback(oAuth2Client,reqname, reqnear, reqfree, reqearly);
     });
   }
     
 
     
-  function listMajors(auth, targetname) {
+  function listMajors(auth, targetname, reqnear, reqfree, reqearly) {
     const sheets = google.sheets({version: 'v4', auth});
     sheets.spreadsheets.values.get({
       spreadsheetId: '1bL7ff47MmFgv2ymKmEdvLd3GnILNU1yNXT7ciKdnWxM',
-      range: 'Sheet1!A2:C'
+      range: 'Sheet1!A2:G'
     }, (err, {data}) => {
       //if (err) return console.log('The API returned an error: ' + err);
       if (err) {
@@ -76,18 +113,19 @@ exports.googlesheets = functions.https.onRequest((request,response) => {
         console.log('No., Name, EntryDate:');
         // Print columns A and E, which correspond to indices 0 and 4.
         rows.map((row) => {
-          //console.log(`${row[0]}, ${row[4]}`);
-          console.log(`${row[0]}, ${row[1]}, ${row[2]}`);
+            //console.log(`${row[0]}, ${row[4]}`);
+            console.log(`${row[0]}, ${row[1]}, ${row[2]}, ${row[3]}, ${row[4]}, ${row[5]}, ${row[6]}`);
         });
       
         console.log('指定の氏名 ' + targetname + ' のエントリ１行を最下行に追加します');
-        var newrange = 'A' + `${rows.length + 1}` + ':' + 'C' + `${rows.length + 1}` ;
+        var newrange = 'A' + `${rows.length + 1}` + ':' + 'F' + `${rows.length + 1}` ;
         console.log('new range: ' + newrange);
         var date = new Date();
         var datestr = date.getFullYear() + '/' + `${date.getMonth() + 1}` + '/' + date.getDate() ; 
-        console.log('todays datestr; ' + datestr);
+        var timestr = date.getHours()  + ':' + date.getMinutes() ;
+	console.log('todays datestr: ' + datestr + '  time: ' + timestr);
         var values = [
-          [ `${rows.length + 1}` , targetname , datestr ]
+            [ `${rows.length + 1}` , targetname , timestr , datestr , reqnear , reqfree , reqearly ]
         ];
         var requestparam = {
           spreadsheetId: '1bL7ff47MmFgv2ymKmEdvLd3GnILNU1yNXT7ciKdnWxM',
